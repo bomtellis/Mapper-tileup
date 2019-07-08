@@ -8,6 +8,8 @@ echo "Greetings! Welcome to Mapper-tileup"
 cat ./splash
 echo "Installer Version $version"
 
+$(chmod +x ./bin/tileup)
+
 apt_update()
 {
     showLoading "Updating apt-get repository"
@@ -40,7 +42,7 @@ install_gem()
 {
     # Install gem
     showLoading "Installing Mapper-tileup gem"
-    `chmod +x ./bin/tileup`
+
     gem install tileup-*.gem 1>> /dev/null || $(echo "Failed to install tileup gem" && exit 0)
 }
 
