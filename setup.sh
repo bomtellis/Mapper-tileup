@@ -1,43 +1,62 @@
 #!/bin/bash
 
 # Author: Tom Bellis
-version=0.0.1
+version=1.0
+trap "exit 1" TERM
+
+# Error handling
+error() {
+  local pid=$$
+  local parent_lineno="$1"
+  local message="$2"
+  local code="${3:-1}"
+  if [[ -n "$message" ]] ; then
+    echo -e "\e[31mError \e[0m on or near line ${parent_lineno}: \e[101m${message}; \e[0m exiting with status ${code}"
+  else
+    echo "Error on or near line ${parent_lineno}; exiting with status ${code}"
+  fi
+  kill -s TERM $pid
+  exit "${code}"
+}
 
 # Display splash
-echo "Greetings! Welcome to Mapper-tileup"
 cat ./splash
-echo "Installer Version $version"
+echo -e "\n"
+echo -e "\e[40m\e[97mMapper-tileup Installer \e[0m"
+echo -e "\e[40m\e[97mVersion: $version \e[0m"
+echo -e "\e[40m\e[97mAuthor: Tom Bellis \e[0m \n"
+echo -e  "\e[1mNB: Ensure you are executing this script with a privileged account e.g \e[91mroot \e[0m\n"
 
 chmod +x ./bin/tileup
 
 apt_update()
 {
     # Update the apt repo
-    apt-get update 1>> /dev/null || echo "Failed to install apt-get repository" & exit 0
+    apt-get update 1>> /dev/null 2>>/dev/null || error ${LINENO} "Failed to run apt-get update"
 }
 
 pkg_install()
 {
     # Install Ruby, Imagemagick
-    apt-get install ruby imagemagick -y 1>> /dev/null || echo "Failed to install core packages" & exit 0
+    apt-get install ruby imagemagick -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
 }
 
 install_dep()
 {
     # Install rmagick
-    gem install rmagick 1>> /dev/null || echo "Failed to install rmagick gem" & exit 0
+    gem install rmagick 1>> /dev/null || error ${LINENO} "Failed to install rmagick gem"
 }
 
 build_gem()
 {
     # Building gemspec
-    gem build tileup.gemspec 1>> /dev/null || echo "Failed to build gemspec" & exit 0
+    gem build tileup.gemspec 1>> /dev/null || error ${LINENO} "Failed to build gemspec"
 }
 
 install_gem()
 {
     # Install gem
-    gem install tileup-*.gem 1>> /dev/null || echo "Failed to install tileup gem" & exit 0
+    gem install tileup-*.gem 1>> /dev/null || error ${LINENO} "Failed to install gem"
 }
 
 showLoading()
@@ -59,7 +78,7 @@ showLoading()
         sleep 0.5
     done
 
-    echo "$loadingText...COMPLETE"
+    echo -e "$loadingText...\e[32m COMPLETE \e[0m"
 }
 
 main()
@@ -70,22 +89,12 @@ main()
     build_gem & showLoading "Building gem"
     install_gem & showLoading "Installing Mapper-tileup gem"
 
-    echo "Mapper-tileup is now installed. This is accessible through the 'tileup' command"
+    echo -e "\e[7mMapper-tileup\e[0m is now \e[32minstalled\e[0m. This is accessible through the \e[7m tileup \e[0m command"
 }
 
-trap main 0
-
-# Error handling
-error() {
-  local parent_lineno="$1"
-  local message="$2"
-  local code="${3:-1}"
-  if [[ -n "$message" ]] ; then
-    echo "Error on or near line ${parent_lineno}: ${message}; exiting with status ${code}"
-  else
-    echo "Error on or near line ${parent_lineno}; exiting with status ${code}"
-  fi
-  exit "${code}"
-}
-
-trap 'error ${LINENO}' ERR
+# find user account
+if [ "$(whoami)" != 'root' ]; then
+    echo -e "Run this script as \e[31mroot \e[0mor try \e[7m sudo bash setup.sh \e[0m"
+else
+    main
+fi
