@@ -70,7 +70,7 @@ main()
     build_gem & showLoading "Building gem"
     install_gem & showLoading "Installing Mapper-tileup gem"
 
-    echo "Mapper-tileup is now installed. Ths is accessible through the 'tileup' command"
+    echo "Mapper-tileup is now installed. This is accessible through the 'tileup' command"
 }
 
 trap main 0
