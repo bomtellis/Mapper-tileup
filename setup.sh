@@ -53,9 +53,9 @@ make_imagemagick()
     cd /usr/local/src/
     tar -xJf ImageMagick-6.9.7-10.tar.xz 1>> /dev/null
     cd ImageMagick-6.9.7-10
-    bash ./configure --disable-static --with-modules --without-perl --without-magick-plus-plus --with-quantum-depth=8 --with-gs-font-dir=/usr/share/fonts/type1/gsfonts/ 1>> /dev/null
-    make  1>> /dev/null
-    make install  1>> /dev/null
+    bash ./configure --disable-static --with-modules --without-perl --without-magick-plus-plus --with-quantum-depth=8 --with-gs-font-dir=/usr/share/fonts/type1/gsfonts/ 1>> /dev/null 1>> /dev/null 2>> /dev/null
+    make  1>> /dev/null 1>> /dev/null 2>> /dev/null
+    make install  1>> /dev/null 2>> /dev/null || error ${LINENO} "Unable to compile ImageMagick"
 }
 
 test_imagemagick()
