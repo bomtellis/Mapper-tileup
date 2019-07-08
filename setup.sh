@@ -8,32 +8,28 @@ echo "Greetings! Welcome to Mapper-tileup"
 cat ./splash
 echo "Installer Version $version"
 
-$(chmod +x ./bin/tileup)
+chmod +x ./bin/tileup
 
 apt_update()
 {
-    showLoading "Updating apt-get repository"
     # Update the apt repo
     apt-get update 1>> /dev/null || $(echo "Failed to install apt-get repository" && exit 0)
 }
 
 pkg_install()
 {
-    showLoading "Installing core packages"
     # Install Ruby, Imagemagick
     apt-get install ruby imagemagick -y 1>> /dev/null || $(echo "Failed to install core packages" && exit 0)
 }
 
 install_dep()
 {
-    showLoading "Installing gem dependancies"
     # Install rmagick
     gem install rmagick 1>> /dev/null || $(echo "Failed to install rmagick gem" && exit 0)
 }
 
 build_gem()
 {
-    showLoading "Building gem"
     # Building gemspec
     gem build tileup.gemspec 1>> /dev/null || $(echo "Failed to build gemspec" && exit 0)
 }
@@ -41,8 +37,6 @@ build_gem()
 install_gem()
 {
     # Install gem
-    showLoading "Installing Mapper-tileup gem"
-
     gem install tileup-*.gem 1>> /dev/null || $(echo "Failed to install tileup gem" && exit 0)
 }
 
@@ -70,11 +64,11 @@ showLoading()
 
 main()
 {
-    apt_update
-    pkg_install
-    install_dep
-    build_gem
-    install_gem
+    apt_update & showLoading "Updating apt-get repository"
+    pkg_install & showLoading "Installing core packages"
+    install_dep & showLoading "Installing gem dependancies"
+    build_gem & showLoading "Building gem"
+    install_gem & showLoading "Installing Mapper-tileup gem"
 
     echo "Mapper-tileup is now installed. Ths is accessible through the 'tileup' command"
 }
