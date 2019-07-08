@@ -38,19 +38,36 @@ apt_update()
 pkg_install()
 {
     # Install Ruby, Imagemagick
-    apt-get install ruby imagemagick libmagickcore-dev libmagickwand-dev build-essential -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
+    apt-get install ruby ruby-dev make gcc build-essential checkinstall -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
+    apt-get build-dep imagemagick -y 1>>/dev/null|| error ${LINENO} "Failed to build dependancies for imagemagick"
 }
 
-sym_link()
+wget_imagemagick()
 {
-    local path = $(eval find /usr/lib/x86_64-linux-gnu/ImageMagick-*/bin-q16/Magick-config -print)
-    ln -s $path /usr/bin/Magick-config
+    cd /usr/local/src/
+    wget http://www.imagemagick.org/download/releases/ImageMagick-6.9.7-10.tar.xz -q 1>> /dev/null || error ${LINENO} "Unable to download ImageMagick"
+}
+
+make_imagemagick()
+{
+    cd /usr/local/src/
+    tar -xJf ImageMagick-6.9.7-10.tar.xz 1>> /dev/null
+    cd ImageMagick-6.9.7-10
+    bash ./configure --disable-static --with-modules --without-perl --without-magick-plus-plus --with-quantum-depth=8 --with-gs-font-dir=/usr/share/fonts/type1/gsfonts/ 1>> /dev/null
+    make  1>> /dev/null
+    make install  1>> /dev/null
+}
+
+test_imagemagick()
+{
+    magick -help 1>>/dev/null || error ${LINENO} "Unable to run imagemagick"
 }
 
 install_dep()
 {
     # Install rmagick
     gem install rmagick 1>> /dev/null || error ${LINENO} "Failed to install rmagick gem"
+    ldconfig /usr/local/lib
 }
 
 build_gem()
@@ -91,7 +108,8 @@ main()
 {
     apt_update & showLoading "Updating apt-get repository"
     pkg_install & showLoading "Installing core packages"
-    sym_link & showLoading "Linking ImageMagick to /usr/bin/"
+    wget_imagemagick & showLoading "Downloading ImageMagick source"
+    make_imagemagick & showLoading "Compiling ImageMagick"
     install_dep & showLoading "Installing gem dependancies"
     build_gem & showLoading "Building gem"
     install_gem & showLoading "Installing Mapper-tileup gem"
