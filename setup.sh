@@ -38,7 +38,13 @@ apt_update()
 pkg_install()
 {
     # Install Ruby, Imagemagick
-    apt-get install ruby imagemagick -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
+    apt-get install ruby imagemagick libmagickwand-core libmagickwand-dev build-essentials -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
+}
+
+sym_link()
+{
+    local path = $(eval find /usr/lib/x86_64-linux-gnu/ImageMagick-*/bin-q16/Magick-config -print)
+    ln -s $path /usr/bin/Magick-config
 }
 
 install_dep()
@@ -85,6 +91,7 @@ main()
 {
     apt_update & showLoading "Updating apt-get repository"
     pkg_install & showLoading "Installing core packages"
+    sym_link & showLoading "Linking ImageMagick to /usr/bin/"
     install_dep & showLoading "Installing gem dependancies"
     build_gem & showLoading "Building gem"
     install_gem & showLoading "Installing Mapper-tileup gem"
