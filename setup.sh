@@ -35,6 +35,7 @@ build_gem()
 install_gem()
 {
     # Install gem
+    chmod +x /bin/tileup
     gem install tileup-*.gem 1>> /dev/null || $(echo "Failed to install tileup gem" && exit 0)
 }
 
