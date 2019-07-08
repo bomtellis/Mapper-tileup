@@ -13,31 +13,31 @@ chmod +x ./bin/tileup
 apt_update()
 {
     # Update the apt repo
-    apt-get update 1>> /dev/null || $(echo "Failed to install apt-get repository" && exit 0)
+    apt-get update 1>> /dev/null || echo "Failed to install apt-get repository" & exit 0
 }
 
 pkg_install()
 {
     # Install Ruby, Imagemagick
-    apt-get install ruby imagemagick -y 1>> /dev/null || $(echo "Failed to install core packages" && exit 0)
+    apt-get install ruby imagemagick -y 1>> /dev/null || echo "Failed to install core packages" & exit 0
 }
 
 install_dep()
 {
     # Install rmagick
-    gem install rmagick 1>> /dev/null || $(echo "Failed to install rmagick gem" && exit 0)
+    gem install rmagick 1>> /dev/null || echo "Failed to install rmagick gem" & exit 0
 }
 
 build_gem()
 {
     # Building gemspec
-    gem build tileup.gemspec 1>> /dev/null || $(echo "Failed to build gemspec" && exit 0)
+    gem build tileup.gemspec 1>> /dev/null || echo "Failed to build gemspec" & exit 0
 }
 
 install_gem()
 {
     # Install gem
-    gem install tileup-*.gem 1>> /dev/null || $(echo "Failed to install tileup gem" && exit 0)
+    gem install tileup-*.gem 1>> /dev/null || echo "Failed to install tileup gem" & exit 0
 }
 
 showLoading()
