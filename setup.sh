@@ -38,7 +38,7 @@ apt_update()
 pkg_install()
 {
     # Install Ruby, Imagemagick
-    apt-get install ruby imagemagick libmagickcore-dev libmagickwand-dev build-essentials -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
+    apt-get install ruby imagemagick libmagickcore-dev libmagickwand-dev build-essential -y 1>> /dev/null || error ${LINENO} "Failed to install core packages"
 }
 
 sym_link()
